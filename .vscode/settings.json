@@ -17,4 +17,7 @@
         "--line-length",
         "100"
     ],
+    "git.branchProtection": [
+        "main"
+    ],
 }
