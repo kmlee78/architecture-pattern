@@ -25,8 +25,8 @@ class OrderLine:
 
 
 class Batch:
-    def __init__(self, ref: str, sku: str, quantity: int, eta: datetime | None):
-        self.reference = ref
+    def __init__(self, reference: str, sku: str, quantity: int, eta: datetime | None):
+        self.reference = reference
         self.sku = sku
         self.eta = eta
         self._purchased_quantity = quantity
