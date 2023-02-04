@@ -10,6 +10,9 @@ packages = [{include = "architecture_pattern"}]
 python = "^3.10"
 fastapi = "^0.89.1"
 sqlalchemy = "^1.4.46"
+asyncpg = "^0.27.0"
+uvicorn = "^0.20.0"
+pydantic = "^1.10.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -55,3 +58,9 @@ warn_unused_ignores = true
 allow_redefinition = true 
 show_column_numbers = true 
 pretty = true 
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+env = [ # Envs for pytest
+    "DB_URL=postgresql+asyncpg://user:password@localhost:5432/app",
+]
