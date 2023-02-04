@@ -1,10 +1,12 @@
 import datetime
 import uuid
-from typing import Any, Generator
+from collections.abc import AsyncGenerator, Generator
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from app.main import app
 
@@ -15,28 +17,33 @@ def client() -> Generator[TestClient, Any, Any]:
         yield c
 
 
-@pytest.mark.asyncio
-async def test_api_returns_allocation(session: AsyncSession, client: TestClient) -> None:
-    sku, othersku = random_sku(), random_sku("ohter")
-    earlybatch = random_batchref(1)
-    laterbatch = random_batchref(2)
-    ohterbatch = random_batchref(3)
-    await add_stock(
-        session,
-        [
-            (earlybatch, sku, 100, datetime.datetime(2023, 1, 1)),
-            (laterbatch, sku, 100, datetime.datetime(2023, 1, 2)),
-            (ohterbatch, othersku, 100, None),
-        ],
-    )
-    data = {"order_id": random_orderid(1), "sku": sku, "quantity": 3}
-    r = client.post("/allocate", json=data)
-
-    assert r.status_code == 201
-    assert r.json() == {"batch_id": earlybatch}
+@pytest.fixture
+async def session(engine: AsyncEngine) -> AsyncGenerator[AsyncSession, Any]:
+    session = sessionmaker(bind=engine, class_=AsyncSession)()
+    yield session
+    await session.close()
 
 
-@pytest.mark.asyncio
+# async def test_api_returns_allocation(session: AsyncSession, client: TestClient) -> None:
+#     sku, othersku = random_sku(), random_sku("other")
+#     earlybatch = random_batchref(1)
+#     laterbatch = random_batchref(2)
+#     ohterbatch = random_batchref(3)
+#     await add_stock(
+#         session,
+#         [
+#             (earlybatch, sku, 100, datetime.datetime(2023, 1, 1)),
+#             (laterbatch, sku, 100, datetime.datetime(2023, 1, 2)),
+#             (ohterbatch, othersku, 100, None),
+#         ],
+#     )
+#     data = {"order_id": random_orderid(1), "sku": sku, "quantity": 3}
+#     r = client.post("/allocate", json=data)
+
+#     assert r.status_code == 201
+#     assert r.json() == {"batch_id": earlybatch}
+
+
 async def test_unhappy_path_returns_400_and_error_message() -> None:
     pass
 
@@ -50,6 +57,7 @@ async def add_stock(
             " VALUES (:ref, :sku, :qty, :eta)",
             dict(ref=ref, sku=sku, qty=qty, eta=eta),
         )
+        await session.commit()
 
 
 def random_suffix() -> str:

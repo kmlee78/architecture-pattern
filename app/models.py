@@ -33,6 +33,7 @@ class Batch:
         self._allocations: set[OrderLine] = set()
 
     def __gt__(self, other: Batch) -> bool:
+        # Batches with earlier eta are sorted first.
         if self.eta is None:
             return False
         if other.eta is None:

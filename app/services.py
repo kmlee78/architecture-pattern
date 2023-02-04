@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import models
-from models import OrderLine
-from repository import AbstractRepository
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app import models
+from app.models import OrderLine
+from app.repository import AbstractRepository
 
 
 class InvalidSku(Exception):

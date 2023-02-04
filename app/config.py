@@ -1,8 +1,8 @@
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, PostgresDsn
 
 
-class Settings(BaseSettings):
-    db_url = Field(env="DB_URL", default="sqlite:///./db.db")
+class Config(BaseSettings):
+    DB_URL: PostgresDsn = Field(env="DB_URL")
 
 
-settings = Settings()
+config = Config()
