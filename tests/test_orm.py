@@ -5,7 +5,7 @@ from app.models import OrderLine
 
 
 async def test_orderline_mapper_can_load_lines(session: AsyncSession) -> None:
-    session.execute(
+    await session.execute(
         sa.text(
             "INSERT INTO order_lines (order_id, sku, quantity) VALUES "
             "('order1', 'RED-CHAIR', 12),"
@@ -22,10 +22,10 @@ async def test_orderline_mapper_can_load_lines(session: AsyncSession) -> None:
     assert [r[0] for r in result.fetchall()] == expected
 
 
-# async def test_orderline_mapper_can_save_lines(session: AsyncSession) -> None:
-#     new_line = OrderLine("order1", "DECORATIVE-WIDGET", 12)
-#     session.add(new_line)
-#     session.flush()
+async def test_orderline_mapper_can_save_lines(session: AsyncSession) -> None:
+    new_line = OrderLine("order1", "DECORATIVE-WIDGET", 12)
+    session.add(new_line)
+    await session.flush()
 
-#     rows = await session.execute(sa.text("SELECT order_id, sku, quantity FROM order_lines"))
-#     assert rows.fetchall() == [("order1", "DECORATIVE-WIDGET", 12)]
+    rows = await session.execute(sa.text("SELECT order_id, sku, quantity FROM order_lines"))
+    assert rows.fetchall() == [("order1", "DECORATIVE-WIDGET", 12)]

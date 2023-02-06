@@ -35,5 +35,5 @@ async def session(engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     trans = await engine.begin()
     session = AsyncSession(bind=trans)
     yield session
-    await session.close()
     await session.rollback()
+    await session.close()

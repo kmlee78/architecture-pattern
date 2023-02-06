@@ -1,6 +1,8 @@
 import abc
 
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import subqueryload
 
 from app.models import Batch
 
@@ -24,10 +26,14 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session = session
 
     async def add(self, batch: Batch) -> None:
-        await self.session.add(batch)
+        self.session.add(batch)
+        await self.session.flush()
 
     async def get(self, reference: str) -> Batch:
-        return await self.session.query(Batch).filter_by(reference=reference).one()
+        return await self.session.get(Batch, reference)
 
     async def list(self) -> list[Batch]:
-        return await self.session.query(Batch).all()
+        result = await self.session.execute(
+            sa.select(Batch).options(subqueryload(Batch._allocations))
+        )
+        return [r[0] for r in result.fetchall()]
