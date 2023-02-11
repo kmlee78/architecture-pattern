@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import models, services
+from app.adapters.repository import SqlAlchemyRepository
 from app.database import session
-from app.repository import SqlAlchemyRepository
+from app.domain import models
 from app.schema import OrderLine
+from app.service import services
 
 router = APIRouter()
 

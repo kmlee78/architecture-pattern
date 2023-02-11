@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import OrderLine
+from app.domain.models import OrderLine
 
 
 async def test_orderline_mapper_can_load_lines(session: AsyncSession) -> None:

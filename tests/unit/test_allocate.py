@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from app.models import Batch, OrderLine, OutOfStock, allocate
+from app.domain.models import Batch, OrderLine, OutOfStock, allocate
 
 today = datetime.today()
 tomorrow = today + timedelta(days=1)

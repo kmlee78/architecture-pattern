@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import subqueryload
 
-from app.models import Batch
+from app.domain.models import Batch
 
 
 class AbstractRepository(abc.ABC):

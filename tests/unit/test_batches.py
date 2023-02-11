@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.models import Batch, OrderLine
+from app.domain.models import Batch, OrderLine
 
 
 def make_batch_and_line(

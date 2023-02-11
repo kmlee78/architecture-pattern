@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from sqlalchemy.orm import registry, relationship
 
-from app import models
+from app.domain import models
 
 mapper_registry = registry()
 metadata = mapper_registry.metadata

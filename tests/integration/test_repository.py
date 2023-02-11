@@ -1,8 +1,8 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Batch
-from app.repository import SqlAlchemyRepository
+from app.adapters.repository import SqlAlchemyRepository
+from app.domain.models import Batch
 
 
 async def insert_order_line(session: AsyncSession) -> int:
