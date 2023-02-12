@@ -28,7 +28,9 @@ async def allocate_endpoint(
         raise HTTPException(status_code=400, detail=f"Invalid sku {line.sku}")
 
     try:
-        batchref = await services.allocate(line, repo, session)
+        batchref = await services.allocate(
+            orderline.order_id, orderline.sku, orderline.quantity, repo, session
+        )
     except models.OutOfStock as e:
         raise HTTPException(status_code=400, detail=f"{e}")
     return {"batchref": batchref}
