@@ -1,10 +1,12 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.adapters.repository import SqlAlchemyRepository
 from app.database import session
 from app.domain import models
-from app.schema import OrderLine
+from app.schema import Batch, OrderLine
 from app.service import services
 
 router = APIRouter()
@@ -28,7 +30,17 @@ async def allocate_endpoint(
         raise HTTPException(status_code=400, detail=f"Invalid sku {line.sku}")
 
     try:
-        batchref = await services.allocate(line, repo, session)
+        batchref = await services.allocate(
+            orderline.order_id, orderline.sku, orderline.quantity, repo, session
+        )
     except models.OutOfStock as e:
         raise HTTPException(status_code=400, detail=f"{e}")
     return {"batchref": batchref}
+
+
+@router.post("/add_batch", status_code=status.HTTP_201_CREATED)
+async def add_batch(batch: Batch, session: AsyncSession = Depends(session)) -> dict[str, str]:
+    repo = SqlAlchemyRepository(session)
+    eta = datetime.fromisoformat(batch.eta) if batch.eta else None
+    await services.add_batch(batch.reference, batch.sku, batch.quantity, eta, repo, session)
+    return {"message": "success"}

@@ -1,6 +1,6 @@
-import datetime
 import uuid
 from collections.abc import AsyncGenerator, Generator
+from datetime import datetime
 from typing import Any
 
 import pytest
@@ -32,8 +32,8 @@ async def test_api_returns_allocation(session: AsyncSession, client: TestClient)
     await add_stock(
         session,
         [
-            (earlybatch, sku, 100, datetime.datetime(2023, 1, 1)),
-            (laterbatch, sku, 100, datetime.datetime(2023, 1, 2)),
+            (earlybatch, sku, 100, datetime(2023, 1, 1)),
+            (laterbatch, sku, 100, datetime(2023, 1, 2)),
             (ohterbatch, othersku, 100, None),
         ],
     )
@@ -48,8 +48,32 @@ async def test_unhappy_path_returns_400_and_error_message() -> None:
     pass
 
 
+async def test_happy_path_returns_201_and_allocated_batch(client: TestClient) -> None:
+    sku, othersku = random_sku(), random_sku("other")
+    earlybatch = random_batchref(1)
+    laterbatch = random_batchref(2)
+    ohterbatch = random_batchref(3)
+
+    client.post(
+        "/add_batch",
+        json={"reference": earlybatch, "sku": sku, "quantity": 100, "eta": "2023-01-01"},
+    )
+    client.post(
+        "/add_batch",
+        json={"reference": laterbatch, "sku": sku, "quantity": 100, "eta": "2023-01-02"},
+    )
+    client.post(
+        "/add_batch", json={"reference": ohterbatch, "sku": othersku, "quantity": 100, "eta": None}
+    )
+    data = {"order_id": random_orderid(), "sku": sku, "quantity": 3}
+    r = client.post("/allocate", json=data)
+
+    assert r.status_code == 201
+    assert r.json() == {"batchref": earlybatch}
+
+
 async def add_stock(
-    session: AsyncSession, batchs: list[tuple[str, str, int, datetime.datetime | None]]
+    session: AsyncSession, batchs: list[tuple[str, str, int, datetime | None]]
 ) -> None:
     for ref, sku, qty, eta in batchs:
         await session.execute(
