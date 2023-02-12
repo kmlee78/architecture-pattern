@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.adapters.repository import AbstractRepository
@@ -25,3 +27,15 @@ async def allocate(
     batchref = models.allocate(line, batches)
     session.commit()
     return batchref
+
+
+async def add_batch(
+    ref: str,
+    sku: str,
+    quantity: int,
+    eta: datetime | None,
+    repo: AbstractRepository,
+    session: AsyncSession,
+) -> None:
+    await repo.add(models.Batch(ref, sku, quantity, eta))
+    session.commit()
