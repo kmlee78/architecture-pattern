@@ -19,14 +19,14 @@ services:
       - python-packages:/usr/local/lib/python3.10/site-packages
       - python-bin:/usr/local/bin
     command: /bin/bash scripts/start-dev.sh
-    
+
   db:
     image: postgres
     restart: always
     container_name: db
     ports:
       - "5432:5432"
-    environment: 
+    environment:
       POSTGRES_DB: app
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
