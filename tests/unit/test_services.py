@@ -32,14 +32,15 @@ class FakeUnitOfWork(AbstractUnitOfWork):
     async def commit(self) -> None:
         self.committed = True
 
-    def rollback(self) -> None:
+    async def rollback(self) -> None:
         pass
 
 
 async def test_add_batch() -> None:
     uow = FakeUnitOfWork()
     await services.add_batch("b1", "CRUNCHY-ARMCHAIR", 100, None, uow)
-    assert uow.batches.get("b1") is not None
+    batch = await uow.batches.get("b1")
+    assert batch is not None
     assert uow.committed is True
 
 

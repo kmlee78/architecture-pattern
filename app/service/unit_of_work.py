@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import abc
-from asyncio import current_task
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_scoped_session
 
 from app.adapters import repository
-from app.config import config
+from app.database import DEFAULT_SESSION_FACTORY
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -26,17 +24,6 @@ class AbstractUnitOfWork(abc.ABC):
     @abc.abstractmethod
     async def rollback(self) -> None:
         raise NotImplementedError
-
-
-DEFAULT_SESSION_FACTORY = async_scoped_session(
-    sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        class_=AsyncSession,
-        bind=create_async_engine(config.DB_URL, echo=False),
-    ),
-    scopefunc=current_task,
-)
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
