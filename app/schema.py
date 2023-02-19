@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
 
-class OrderLine(BaseModel):
+class OrderLineIn(BaseModel):
     order_id: str
     sku: str
     quantity: int
 
 
-class Batch(BaseModel):
+class BatchIn(BaseModel):
     reference: str
     sku: str
     quantity: int

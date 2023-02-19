@@ -2,7 +2,7 @@ import abc
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import subqueryload
+from sqlalchemy.orm import selectinload, subqueryload
 
 from app.domain.models import Batch
 
@@ -30,7 +30,12 @@ class SqlAlchemyRepository(AbstractRepository):
         await self.session.flush()
 
     async def get(self, reference: str) -> Batch:
-        return await self.session.get(Batch, reference)
+        result = await self.session.execute(
+            sa.select(Batch)
+            .where(Batch.reference == reference)
+            .options(selectinload(Batch._allocations))
+        )
+        return result.scalar_one()
 
     async def list(self) -> list[Batch]:
         result = await self.session.execute(

@@ -9,6 +9,16 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config import config
 
+DEFAULT_SESSION_FACTORY = async_scoped_session(
+    sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        class_=AsyncSession,
+        bind=create_async_engine(config.DB_URL, echo=False),
+    ),
+    scopefunc=current_task,
+)
+
 
 class DataBase:
     def __init__(self, db_url: str) -> None:
